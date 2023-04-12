@@ -804,3 +804,542 @@ Poner Mapa acá
 
 
 
+---
+
+class: inverse, center, middle
+
+# ANÁLISIS DE LA INFORMACIÓN DISPONIBLE
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+#Gráfico
+
+
+eoh <- read.csv("entradas/eoh/Viajeros-hospedados-residentes-y-no-residentes.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+
+ggplot(data = eoh %>%
+         filter(anio %in% c("2019","2020","2021","2022")) %>% 
+         mutate(viajeros=viajeros/1000),aes(x=anio_mes,y=viajeros,color=origen_viajeros))+
+  geom_line(size=2.5, alpha = 0.5)+
+  geom_point(size=5, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Viajeros hospedados según residencia",
+       subtitle = "Total país, 2019-2022.",
+       x = "",
+       y = "Turistas (en miles)",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+
+```
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+#Gráfico
+
+
+eoh <- read.csv("entradas/eoh/Viajeros-hospedados-residentes-y-no-residentes-por-destino.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio=="2019") %>% 
+  group_by(anio,region_de_destino,origen_viajeros) %>% 
+  summarise(viajeros=sum(viajeros)) %>%
+  mutate(prop=(round(prop.table(viajeros),3))*100) %>% 
+  ungroup %>% 
+  select(-anio)
+
+#Gráfico
+
+ggplot(data = eoh,aes(x=region_de_destino,y=prop,fill=origen_viajeros,label=glue("{prop} %")))+
+  geom_col()+
+  geom_text(position = position_stack(vjust = .5))+
+  scale_y_continuous(labels = function(x) paste0(x,"%"))+
+  labs(title = "Distribución de los viajeros hospedados segun origen, por región de destino.",
+       subtitle = "AÑO 2019.",
+       x = "",
+       y = "",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 12),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "top",
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+rm(eoh)
+
+```
+
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+#Gráfico
+
+
+eoh <- read.csv("entradas/eoh/Pernoctes-residentes-y-no-residentes.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+
+ggplot(data = eoh %>%
+         filter(anio %in% c("2019","2020","2021","2022")) %>% 
+         mutate(pernoctes=pernoctes/1000),aes(x=anio_mes,y=pernoctes,color=origen_pernoctes))+
+  geom_line(size=2.5, alpha = 0.5)+
+  geom_point(size=5, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Pernoctes según residencia",
+       subtitle = "Total país, 2019-2022.",
+       x = "",
+       y = "Pernoctes (en miles)",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+```
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+#Gráfico
+
+eoh <- read.csv("entradas/eoh/Pernoctes-residentes-y-no-residentes-por-destino.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2019","2020","2021") & region_de_destino=="CABA") %>% 
+  group_by(anio_mes,region_de_destino,origen_pernoctes) %>% 
+  summarise(pernoctes=round(sum(pernoctes)/1000,1))
+
+ggplot(data = eoh,aes(x=anio_mes,y=pernoctes,color=origen_pernoctes))+
+  geom_line(size=2.5, alpha = 0.5)+
+  geom_point(size=5, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Pernoctes según residencia",
+       subtitle = "CABA, 2019-2021.",
+       x = "",
+       y = "Pernoctaciones (en miles)",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+
+rm(eoh)
+
+```
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+eoh <- read.csv("entradas/eoh/Pernoctes-residentes-y-no-residentes-por-destino.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2019","2020","2021")) %>% 
+  group_by(anio,region_de_destino) %>% 
+  summarise(pernoctes=sum(pernoctes,na.rm=TRUE)) %>%
+  mutate(prop=(round(prop.table(pernoctes),3))*100) %>% 
+  ungroup() %>%
+  select(-pernoctes)
+
+#Gráfico
+
+ggplot(data = eoh,aes(x=anio,y=prop,fill=region_de_destino,label=glue("{prop} %")))+
+  geom_col()+
+  geom_text(position = position_stack(vjust = .5))+
+  scale_y_continuous(labels = function(x) paste0(x,"%"))+
+  labs(title = "Distribución de los pernoctes según región de destino.",
+       subtitle = "AÑOS 2019-2021.",
+       x = "",
+       y = "",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 12),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "top",
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+
+```
+
+
+---
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+
+eoh <- read.csv("entradas/eoh/estadia-media-residentes-y-no-residentes-por-destino.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2019") & origen_viajeros=="Total") 
+  
+
+#Gráfico
+
+
+ggplot(data = eoh,aes(x=anio_mes,y=estadia_media_en_noches,color=region_de_destino))+
+  geom_point(size=5, alpha = 0.5,shape=17)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Estadía promedio en noches según región de destino",
+       subtitle = "AÑO 2019.",
+       x = "",
+       y = "(noches)",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+
+```
+
+
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+eoh <- read.csv("entradas/eoh/tasas-de-ocupación-plazas-por-categoría.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2019"))
+
+#Gráfico
+
+
+ggplot(data = eoh,aes(x=anio_mes,y=tasa_de_ocupacion_plazas,color=categoria_del_hotel))+
+  geom_line(size=2.5, alpha = 0.5)+
+  geom_point(size=5, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Tasa de ocupación en plazas según categoría",
+       subtitle = "Total país, AÑO 2019.",
+       x = "",
+       y = "Tasa de ocupación en plazas",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+
+```
+
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+eoh <- read.csv("entradas/eoh/tasas-de-ocupación-plazas-por-región-y-categoría.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2019") & categoria_del_hotel=="Total") 
+  
+
+#Gráfico
+
+
+ggplot(data = eoh,aes(x=anio_mes,y=tasa_de_ocupacion_plazas,color=region_de_destino))+
+  geom_line(size=2.5, alpha = 0.5)+
+  geom_point(size=5, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Tasa de ocupación en plazas según región de destino",
+       subtitle = "AÑO 2019.",
+       x = "",
+       y = "Tasa de ocupación en plazas",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+
+```
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+eoh <- read.csv("entradas/eoh/tarifa-media-diaria-por-categoría.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2018","2019","2020","2021","2022")) 
+  
+
+#Gráfico
+
+
+ggplot(data = eoh,aes(x=anio_mes,y=tarifa_media_diaria,color=categoria_del_hotel))+
+  geom_line(size=2.5, alpha = 0.5)+
+  geom_point(size=5, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Tarifa media diaria según categoría.",
+       subtitle = "Total país, AÑOS 2019-2022.",
+       x = "",
+       y = "En pesos a precios corrientes.",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+
+```
+
+
+---
+
+.left[EOH: análisis de la información disponible]
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+eoh <- read.csv("entradas/eoh/tarifa-media-diaria-por-región-y-categoría.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
+  select(-observaciones)
+
+eoh <- eoh %>% 
+  filter(anio %in% c("2018","2019","2020","2021","2022") & categoria_del_hotel=="Total") 
+  
+
+#Gráfico
+
+
+ggplot(data = eoh,aes(x=anio_mes,y=tarifa_media_diaria,color=region_de_destino))+
+  geom_line(size=1.5, alpha = 0.5)+
+  geom_point(size=3, alpha = 0.5)+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Tarifa media diaria según categoría.",
+       subtitle = "Total país, AÑOS 2019-2022.",
+       x = "",
+       y = "En pesos a precios corrientes.",
+       colour="",
+       caption = "Fuente: EOH") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth = 1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            size = 0.1,
+                                            linewidth  = 1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+rm(eoh)
+
+
+```
