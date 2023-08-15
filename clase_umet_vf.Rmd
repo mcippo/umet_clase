@@ -738,16 +738,13 @@ class: justify, middle
 - **Periodicidad**: Mensual, desde 2004.
 
 
-- **Temporalidad**: Encuesta de carácter mensual (Año 2006, 1er. Trim 2011 y  año 2012 de forma continua).
-
-
 - **Representatividad geográfica**: Se relevan 49 localidades, cuyos resultados se expanden a la totalidad de las regiones MINTURDEP
 
 
 - **Método de recolección**: Cuestionario Auto-administrado.
 
 
-- **Método de recolección**: 50 días posteriores al período relevado.
+- **Periodicidad de publicación de los datos**: 50 días posteriores al período relevado.
 
 ---
 
@@ -1289,7 +1286,7 @@ ggplot(data = eoh,aes(x=anio_mes,y=tarifa_media_diaria,color=region_de_destino))
   geom_line(size=1.5, alpha = 0.5)+
   geom_point(size=3, alpha = 0.5)+
   geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
-  labs(title = "Tarifa media diaria según categoría.",
+  labs(title = "Tarifa media diaria según región de destino.",
        subtitle = "Total país, AÑOS 2018-2022.",
        x = "",
        y = "En pesos a precios corrientes.",
@@ -1539,6 +1536,63 @@ eti <- read.csv("entradas/eti/turistas_pernoctes_estadia_media_turistas_no_resid
          mes = str_sub(indice_tiempo,6,7),
          anio_mes =glue("{anio}-{mes}-01"),
          anio_mes=as.Date(anio_mes)) %>% 
+  filter(anio_mes>="2018-01-01" & anio_mes<="2022-12-01")
+
+eti <- eti %>% 
+  group_by(anio_mes) %>%
+  summarise(turistas=sum(turistas_no_residentes))
+
+
+
+#Gráfico
+
+
+ggplot(data = eti ,aes(x=anio_mes,y=turistas))+
+  geom_line(size=1.5, alpha = 0.5,color="orange")+
+  geom_point(size=3, alpha = 0.5,color="orange")+
+  geom_hline(yintercept = 0, color = "grey", alpha =0.7, size = 0.5)+
+  labs(title = "Evolución de los turistas no residentes",
+       subtitle = "EZEIZA Y AEROPARQUE, 2018-2022.",
+       x = "",
+       y = "Turistas no residentes",
+       colour="",
+       caption = "Fuente: ETI") +
+  theme(text = element_text(size = 14),
+        plot.caption  = element_text(hjust = 0),
+        plot.subtitle=element_text(colour = "grey29"),
+        plot.title=element_text(hjust = 0,face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        panel.grid.major.y =  element_line (colour = "grey",
+                                            linewidth = 0.1),
+        panel.grid.major.x =  element_line (colour = "grey",
+                                            linewidth  = 0.1),
+        panel.background = element_blank(),
+        axis.text.x = element_text(angle = 90))+
+  scale_x_date(date_breaks = "1 months",
+               date_labels = "%b-%y")+
+  scale_y_continuous(n.breaks=10)
+
+
+rm(eti)
+
+```
+
+
+
+---
+
+
+.left[ETI: análisis de la información disponible]
+
+```{r fig.height = 8, fig.width=12, fig.align='center'}
+
+
+eti <- read.csv("entradas/eti/turistas_pernoctes_estadia_media_turistas_no_residentes_por_residencia_ezeiza_aeroparque_mensual.csv") %>% 
+  mutate(anio = str_sub(indice_tiempo,1,4),
+         mes = str_sub(indice_tiempo,6,7),
+         anio_mes =glue("{anio}-{mes}-01"),
+         anio_mes=as.Date(anio_mes)) %>% 
   filter(anio_mes>="2017-01-01" & anio_mes<="2019-12-01")
 
 
@@ -1657,7 +1711,7 @@ ggplot(data = parques,aes(x=anio_mes,y=visitas,color=origen_visitantes))+
        x = "",
        y = "Visitantes",
        colour="",
-       caption = "FUENTE: Dirección Nacional de Mercados y Estadística, Ministerio de Turismo y Deportes, en base a datos suministrados por la Dirección de Mercadeo de la Dirección Nacional de Uso Público de la Administración de Parques Nacionales.") +
+       caption = "FUENTE: Dirección Nacional de Mercados y Estadística, Ministerio de Turismo y Deportes,\nen base a datos suministrados por la Dirección de Mercadeo de la Dirección Nacional de Uso Público de la Administración de Parques Nacionales.") +
   theme(text = element_text(size = 14),
         plot.caption  = element_text(hjust = 0),
         plot.subtitle=element_text(colour = "grey29"),
